@@ -6,4 +6,5 @@ RUN npm install -g n8n
 
 EXPOSE 5678
 
-CMD ["node", "--no-warnings", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
+# Executa o binário do n8n diretamente com Node, ignorando warnings
+CMD ["node", "--no-warnings", "/usr/local/bin/n8n"]
