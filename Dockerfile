@@ -1,10 +1,15 @@
+# Use Node 18 (Debian Bullseye)
 FROM node:18-bullseye
 
+# Diretório de trabalho
 WORKDIR /app
 
-RUN npm install -g n8n
+# Instala n8n globalmente e cria link simbólico para PATH
+RUN npm install -g n8n \
+    && ln -s /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n
 
+# Expor porta padrão do n8n
 EXPOSE 5678
 
-# Executa o binário do n8n diretamente com Node, ignorando warnings
-CMD ["node", "--no-warnings", "/usr/local/bin/n8n"]
+# Comando para iniciar o n8n
+CMD ["n8n"]
