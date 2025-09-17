@@ -3,7 +3,7 @@ name: Railway Scheduler
 on:
   schedule:
     - cron: '0 10 * * 1-5' # Liga Postgres + n8n às 07h BR
-    - cron: '25 16 * * 1-5' # Desliga n8n + Postgres às 20:00 BR
+    - cron: '0 18 * * 1-5' # Desliga n8n + Postgres às 20:00 BR
   workflow_dispatch:
 
 jobs:
