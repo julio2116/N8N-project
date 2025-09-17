@@ -2,32 +2,48 @@ name: Railway Scheduler
 
 on:
   schedule:
-    - cron: '0 11 * * 1-5' # Liga 08h BR
-    - cron: '0 23 * * 1-5' # Desliga 20h BR
+    - cron: '0 11 * * 1-5' # Liga serviços às 08h BR
+    - cron: '20 15 * * 1-5' # Desliga serviços às 20h BR
   workflow_dispatch:
 
 jobs:
-  control:
+  control-services:
     runs-on: ubuntu-latest
     steps:
-      - name: Start Service (08h BR)
-        if: github.event.schedule == '0 11 * * 1-5'
-        run: |
-          curl -X POST https://backboard.railway.app/graphql/v2 \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{"query":"mutation { serviceInstanceStart(id: \"'"$SERVICE_ID"'\") { id status } }"}'
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Stop Service (20h BR)
-        if: github.event.schedule == '0 23 * * 1-5'
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Login to Railway
+        run: railway login --apiKey ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Control Services
         run: |
-          curl -X POST https://backboard.railway.app/graphql/v2 \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{"query":"mutation { serviceInstanceStop(id: \"'"$SERVICE_ID"'\") { id status } }"}'
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+          if [ "${{ github.event.schedule }}" = '0 11 * * 1-5' ]; then
+            echo "Subindo serviços: Postgres → n8n"
+
+            # 1️⃣ Subir Postgres
+            cd postgres-service
+            railway up --environment production
+            cd ..
+
+            # 2️⃣ Subir n8n
+            cd n8n-service
+            railway up --environment production
+            cd ..
+
+          elif [ "${{ github.event.schedule }}" = '0 23 * * 1-5' ]; then
+            echo "Derrubando serviços: n8n → Postgres"
+
+            # 1️⃣ Derrubar n8n
+            cd n8n-service
+            railway down
+            cd ..
+
+            # 2️⃣ Derrubar Postgres
+            cd postgres-service
+            railway down
+            cd ..
+          fi
