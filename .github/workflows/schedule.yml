@@ -2,48 +2,38 @@ name: Railway Scheduler
 
 on:
   schedule:
-    - cron: '0 11 * * 1-5' # Liga serviços às 08h BR
-    - cron: '20 15 * * 1-5' # Desliga serviços às 20h BR
+    - cron: '0 10 * * 1-5' # Liga Postgres + n8n às 07h BR
+    - cron: '15 16 * * 1-5' # Desliga n8n + Postgres às 20:00 BR
   workflow_dispatch:
 
 jobs:
-  control-services:
+  control:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Login to Railway
-        run: railway login --apiKey ${{ secrets.RAILWAY_TOKEN }}
-
-      - name: Control Services
+      - name: Start Postgres (07h BR)
+        if: github.event.schedule == '0 10 * * 1-5'
         run: |
-          if [ "${{ github.event.schedule }}" = '0 11 * * 1-5' ]; then
-            echo "Subindo serviços: Postgres → n8n"
+          railway up --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.POSTGRES_SERVICE_ID }} --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-            # 1️⃣ Subir Postgres
-            cd postgres-service
-            railway up --environment production
-            cd ..
+      - name: Start n8n (07h BR)
+        if: github.event.schedule == '0 10 * * 1-5'
+        run: |
+          railway up --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.N8N_SERVICE_ID }} --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-            # 2️⃣ Subir n8n
-            cd n8n-service
-            railway up --environment production
-            cd ..
+      - name: Stop n8n (20:00 BR)
+        if: github.event.schedule == '15 16 * * 1-5'
+        run: |
+          railway down --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.N8N_SERVICE_ID }} --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-          elif [ "${{ github.event.schedule }}" = '0 23 * * 1-5' ]; then
-            echo "Derrubando serviços: n8n → Postgres"
-
-            # 1️⃣ Derrubar n8n
-            cd n8n-service
-            railway down
-            cd ..
-
-            # 2️⃣ Derrubar Postgres
-            cd postgres-service
-            railway down
-            cd ..
-          fi
+      - name: Stop Postgres (20:00 BR)
+        if: github.event.schedule == '15 16 * * 1-5'
+        run: |
+          railway down --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.POSTGRES_SERVICE_ID }} --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
