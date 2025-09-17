@@ -11,28 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Start Postgres (07h BR)
-        if: github.event.schedule == '0 10 * * 1-5'
         run: |
           railway up --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.POSTGRES_SERVICE_ID }} --environment production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Start n8n (07h BR)
-        if: github.event.schedule == '0 10 * * 1-5'
         run: |
           railway up --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.N8N_SERVICE_ID }} --environment production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Stop n8n (20:00 BR)
-        if: github.event.schedule == '15 16 * * 1-5'
         run: |
           railway down --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.N8N_SERVICE_ID }} --environment production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Stop Postgres (20:00 BR)
-        if: github.event.schedule == '15 16 * * 1-5'
         run: |
           railway down --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.POSTGRES_SERVICE_ID }} --environment production
         env:
