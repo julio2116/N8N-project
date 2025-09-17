@@ -24,7 +24,7 @@ jobs:
       - name: Garantir que app está rodando entre 08h e 20h
         run: |
           HORA=$(date +%H)
-          if [ $HORA -ge 8 ] && [ $HORA -lt 20 ]; then
+          if [ $HORA -ge 8 ] && [ $HORA -lt 9 ]; then
             echo "🔵 Horário comercial -> Ligando app"
             railway up
           else
