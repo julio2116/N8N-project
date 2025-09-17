@@ -10,6 +10,10 @@ jobs:
   control:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Railway CLI
+        run: |
+          npm install -g @railway/cli
+
       - name: Start Postgres (07h BR)
         run: |
           railway up --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ secrets.POSTGRES_SERVICE_ID }} --environment production
