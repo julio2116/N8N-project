@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Railway CLI
-        run: ls
+        run: npm install -g @railway/cli
 
       - name: Stop n8n
         run: railway down
