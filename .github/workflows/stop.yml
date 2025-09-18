@@ -2,7 +2,8 @@ name: Railway Down
 
 on:
   schedule:
-    - cron: '0 23 * * 1-5'   # 20h BR
+    # Executa de segunda a sexta-feira às 23:00 (UTC), que corresponde às 20:00 BRT.
+    - cron: '0 23 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -16,6 +17,6 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Stop Project
-        run: railway down
+        run: railway down -y
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
