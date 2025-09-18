@@ -10,18 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Railway CLI
-        run: npm install -g @railway/cli
+        run: ls
+          npm install -g @railway/cli
 
       - name: Stop n8n
         run: railway down
-            cd ..
         working-directory: n8n-service
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Stop Postgres
-        run: cd ..
-            railway down
+        run: railway down
         working-directory: postgres-service
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
