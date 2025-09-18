@@ -1,25 +1,21 @@
-name: Start Services
+name: Railway Up
 
 on:
   schedule:
-    - cron: '0 10 * * 1-5'   # 07:00 BR (10:00 UTC)
+    - cron: '0 10 * * 1-5'   # 07h BR
   workflow_dispatch:
 
 jobs:
-  start:
+  up:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Start Postgres
+      - name: Start Project
         run: railway up
-        working-directory: ./postgres-service
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-      - name: Start n8n
-        run: railway up
-        working-directory: ./n8n-service
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
