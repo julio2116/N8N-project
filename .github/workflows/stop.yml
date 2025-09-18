@@ -1,0 +1,25 @@
+name: Stop Services
+
+on:
+  schedule:
+    - cron: '0 23 * * 1-5'   # 20:00 BR (23:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Stop n8n
+        run: railway down
+        working-directory: ./n8n-service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Stop Postgres
+        run: railway down
+        working-directory: ./postgres-service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
