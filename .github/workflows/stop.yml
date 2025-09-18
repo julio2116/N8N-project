@@ -16,6 +16,9 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: LOGIN
+        run: railway login -b
+
       - name: Stop Project
         run: railway down -s ${{secrets.N8N_SERVICE}}
         env:
