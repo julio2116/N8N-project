@@ -17,9 +17,13 @@ jobs:
       
       - name: LOGIN
         run: railway login -b
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: link
         run: railway service ${{secrets.N8N_SERVICE}}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Start Project
         run: railway up -s ${{secrets.N8N_SERVICE}}
