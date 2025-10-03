@@ -1,0 +1,15 @@
+name: Ping Render n8n
+
+on:
+  schedule:
+    # A cada 12 minutos, de segunda a sexta, entre 8h e 18h
+    - cron: "*/12 8-18 * * 1-5"
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping n8n server
+        run: |
+          echo "Ping para manter o n8n acordado"
+          curl -s https://n8n-project-3h24.onrender.com > /dev/null
